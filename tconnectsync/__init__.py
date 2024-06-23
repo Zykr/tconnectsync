@@ -2,6 +2,7 @@ import sys
 import datetime
 import arrow
 import argparse
+import datetime
 import logging
 import pkg_resources
 
@@ -10,6 +11,7 @@ from .process import process_time_range
 from .autoupdate import Autoupdate
 from .check import check_login
 from .nightscout import NightscoutApi
+from .util import raw
 from .features import DEFAULT_FEATURES, ALL_FEATURES
 
 try:
@@ -38,6 +40,7 @@ def parse_args(*args, **kwargs):
     parser.add_argument('--version', action='version', version='tconnectsync %s' % __version__)
     parser.add_argument('--pretend', dest='pretend', action='store_const', const=True, default=False, help='Pretend mode: do not upload any data to Nightscout.')
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_const', const=True, default=False, help='Verbose mode: show extra logging details')
+    parser.add_argument('-r', '--raw', dest='raw', action='store_const', const=True, default=False, help='raw mode: save copies of raw data downloaded from t:connect')
     parser.add_argument('--start-date', dest='start_date', type=str, default=None, help='The oldest date to process data from. Must be specified with --end-date.')
     parser.add_argument('--end-date', dest='end_date', type=str, default=None, help='The newest date to process data until (inclusive). Must be specified with --start-date.')
     parser.add_argument('--days', dest='days', type=int, default=1, help='The number of days of t:connect data to read in. Cannot be used with --from-date and --until-date.')
@@ -50,13 +53,24 @@ def parse_args(*args, **kwargs):
 def main(*args, **kwargs):
     args = parse_args(*args, **kwargs)
 
-    if args.verbose:
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format='%(asctime)s %(levelname)-8s %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S')
-        logging.root.debug("Set logging level to DEBUG")
-    else:
+    if args.verbose or args.raw:
+        if args.raw:
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            logging.basicConfig(
+                filename= 'log/' + 'run_' + timestr + '.log',
+                level=logging.DEBUG,
+                format='%(asctime)s %(levelname)-8s %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S')
+            logging.root.debug("Set logging level to DEBUG")
+            logging.root.debug("Exporting raw data")
+            util.raw = 1
+        else: #verbose but no raw dumps
+            logging.basicConfig(
+                level=logging.DEBUG,
+                format='%(asctime)s %(levelname)-8s %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S')
+            logging.root.debug("Set logging level to DEBUG")
+    else: #not verbose
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s %(levelname)-8s %(message)s',
@@ -100,6 +114,7 @@ def main(*args, **kwargs):
         sys.exit(u.process(tconnect, nightscout, time_start, time_end, args.pretend, features=args.features))
     else:
         print("Processing data between", time_start, "and", time_end, "(PRETEND)" if args.pretend else "")
+        logging.root.debug("Processing data between " + time_start.strftime('%Y-%m-%d %H:%M:%S') + " and " + time_end.strftime('%Y-%m-%d %H:%M:%S') + " (PRETEND)" if args.pretend else "")
         added = process_time_range(tconnect, nightscout, time_start, time_end, args.pretend, features=args.features)
         print("Added", added, "items")
 

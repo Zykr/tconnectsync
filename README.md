@@ -1,7 +1,17 @@
 # tconnectsync
 
-![Python Package workflow](https://github.com/jwoglom/tconnectsync/actions/workflows/python-package.yml/badge.svg)
-[![codecov](https://codecov.io/gh/jwoglom/tconnectsync/branch/master/graph/badge.svg)](https://codecov.io/gh/jwoglom/tconnectsync)
+----
+Fork of jwoglom's tconnectsync, adding a partial raw data export option.
+The issues I originally forked to work on seem to be fixed. No reason to use this version unless you need the export function.
+
+	* Left an added exception handler around bug that now seems fixed
+  		parse date throws exception and fails if an extended bolus is in progress during the upload.
+	
+
+I recommend using jwoglom's version as I've very little experience with python. If you see something horribly wrong with my code, please do leave a bug report.
+
+Everything below this point in the README is a copy from jwoglom, so if you do choose to use my version take note of that.
+----
 
 Tconnectsync synchronizes data one-way from the Tandem Diabetes t:connect web/mobile application to Nightscout.
 

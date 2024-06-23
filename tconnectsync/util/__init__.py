@@ -25,6 +25,9 @@ def removesuffix(input_string, suffix):
         return input_string[:-len(suffix)]
     return input_string
 
+global raw
+raw = 0
+
 def removeprefix(input_string, prefix):
     if prefix and input_string.startswith(prefix):
         return input_string[len(prefix):]

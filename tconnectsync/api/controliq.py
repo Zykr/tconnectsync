@@ -5,7 +5,7 @@ import logging
 
 from bs4 import BeautifulSoup
 
-from ..util import timeago, cap_length
+from ..util import raw, timeago, cap_length
 from .common import parse_date, base_headers, base_session, ApiException, ApiLoginException
 
 logger = logging.getLogger(__name__)
@@ -114,6 +114,8 @@ class ControlIQApi:
 
         if r.status_code != 200:
             raise ApiException(r.status_code, "ControlIQ API HTTP %s response: %s" % (str(r.status_code), r.text))
+        if raw:
+            logger.debug("controliq raw: \n%s" % pformat(r.text))
         return r.json()
 
 

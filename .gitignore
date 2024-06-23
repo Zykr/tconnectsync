@@ -9,3 +9,6 @@ build
 .env
 tconnectsync-check-output.log
 ignore_*
+*.txt
+*.csv
+*.log

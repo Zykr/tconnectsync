@@ -1,8 +1,16 @@
-from os import stat
+import logging
 import sys
-import arrow
-from tconnectsync.domain.bolus import Bolus
+from os import stat
+from pprint import pformat
 
+import arrow
+from arrow.parser import DateTimeParser, ParserError
+
+from ..util import raw
+
+logger = logging.getLogger(__name__)
+
+from tconnectsync.domain.bolus import Bolus
 from tconnectsync.domain.therapy_event import BolusTherapyEvent, CGMTherapyEvent, BGTherapyEvent, BasalTherapyEvent
 
 try:
@@ -69,7 +77,14 @@ class TConnectEntry:
 
     @staticmethod
     def _datetime_parse(date):
-        return arrow.get(date, tzinfo=TIMEZONE_NAME)
+        try:
+            dateValue = arrow.get(date, tzinfo=TIMEZONE_NAME)
+
+        except ParserError:
+            logging.root.debug("parse date failed")
+            dateValue = "Null"
+
+        return dateValue
 
     @staticmethod
     def parse_cgm_entry(data):
@@ -102,8 +117,11 @@ class TConnectEntry:
     @staticmethod
     def parse_bolus_entry(data):
         # All DateTime's are stored in the user's timezone.
+        if raw:
+            logger.debug("controliq raw: \n%s" % pformat(data))
+
         def is_complete(s):
-            return s and int(s) == 1
+            return s and int(s or 0) == 1
 
         complete = is_complete(data["ExtendedBolusIsComplete"]) or is_complete(data["BolusIsComplete"])
         extended_bolus = ("extended" in data["Description"].lower())

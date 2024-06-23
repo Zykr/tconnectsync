@@ -285,12 +285,4 @@ class WebUIScraper:
             return self.device_settings_from_guid(dev['guid'])
         
         raise RuntimeError('Unable to find pump with serial number: %s. Known devices: %s' % (pump_serial, devices))
-
-
-
-
-
-
-
-
                 

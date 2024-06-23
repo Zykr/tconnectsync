@@ -8,9 +8,12 @@ import arrow
 import time
 import logging
 
+from pprint import pformat
+
+
 from bs4 import BeautifulSoup
 
-from ..util import timeago
+from ..util import raw, timeago
 from .common import ApiException, ApiLoginException, parse_date, base_session
 
 logger = logging.getLogger(__name__)
@@ -96,6 +99,8 @@ class AndroidApi:
 
         if r.status_code != 200:
             raise ApiException(r.status_code, "Android API HTTP %s response: %s" % (str(r.status_code), r.text))
+        if raw:
+            logger.debug("androidget raw: \n%s" % pformat(r.text))
         return r.json()
 
     def get(self, endpoint, query={}, tries=0, **kwargs):
@@ -122,6 +127,8 @@ class AndroidApi:
         r = self.session.post(self.BASE_URL + endpoint, query, headers=self.api_headers(), **kwargs)
         if r.status_code != 200:
             raise ApiException(r.status_code, "Internal API HTTP %s response: %s" % (str(r.status_code), r.text))
+        if raw:
+            logger.debug("androidpost raw: \n%s" % pformat(r.text))
         return r.json()
 
     """
@@ -167,3 +174,4 @@ class AndroidApi:
     """
     def user_profile(self):
         return self.get('cloud/usersettings/api/UserProfile?userId=%s' % self.userId)
+

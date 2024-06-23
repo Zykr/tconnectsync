@@ -1,9 +1,13 @@
-import requests
-import datetime
 import csv
+import datetime
+import json
 import logging
 import time
-import json
+from pprint import pformat
+
+import requests
+
+from ..util import raw
 
 from .common import base_session, parse_date, parsed_date_to_arrow, base_headers, days_between, split_days_range, ApiException
 
@@ -25,6 +29,8 @@ class WS2Api:
         r = self.session.get(self.BASE_URL + endpoint, headers=base_headers(), **kwargs)
         if r.status_code != 200:
             raise ApiException(r.status_code, "WS2 API HTTP %s response: %s" % (str(r.status_code), r.text))
+        if raw:
+            logger.debug("ws2 raw: \n%s" % pformat(r.text))
         return r.text
 
     def get_jsonp(self, endpoint, **kwargs):
