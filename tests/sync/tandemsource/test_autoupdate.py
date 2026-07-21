@@ -719,7 +719,7 @@ class TestTandemSourceAutoupdate(unittest.TestCase):
 
         with mock.patch('tconnectsync.sync.tandemsource.autoupdate.ChooseDevice', FakeChooseDevice), \
              mock.patch('tconnectsync.sync.tandemsource.autoupdate.ProcessTimeRange', FakeProcessTimeRange), \
-             mock.patch('tconnectsync.sync.tandemsource.autoupdate.time.time', side_effect=[1000, 1001, 1002]), \
+             mock.patch('tconnectsync.sync.tandemsource.autoupdate.time.time', return_value=1000), \
              mock.patch('tconnectsync.sync.tandemsource.autoupdate.time.sleep', return_value=None), \
              self.assertLogs('tconnectsync.sync.tandemsource.autoupdate', level='INFO') as logs:
             result = autoupdate.process(object(), object(), pretend=False)
@@ -731,7 +731,7 @@ class TestTandemSourceAutoupdate(unittest.TestCase):
         autoupdate = TandemSourceAutoupdate(self.secret)
 
         with mock.patch('tconnectsync.sync.tandemsource.autoupdate.ChooseDevice', FakeChooseDevice), \
-             mock.patch('tconnectsync.sync.tandemsource.autoupdate.time.time', side_effect=[2000, 2001, 2002]), \
+             mock.patch('tconnectsync.sync.tandemsource.autoupdate.time.time', return_value=2000), \
              mock.patch('tconnectsync.sync.tandemsource.autoupdate.time.sleep', return_value=None), \
              self.assertLogs('tconnectsync.sync.tandemsource.autoupdate', level='INFO') as logs:
             result = autoupdate.process(object(), object(), pretend=True)
