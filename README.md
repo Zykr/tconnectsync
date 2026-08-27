@@ -13,29 +13,29 @@ I recommend using jwoglom's version as I've very little experience with python. 
 Everything below this point in the README is a copy from jwoglom, so if you do choose to use my version take note of that.
 ----
 
-Tconnectsync synchronizes data one-way from the Tandem Diabetes t:connect web/mobile application to Nightscout.
+Tconnectsync synchronizes data one-way from Tandem Source to Nightscout.
+
+> [!IMPORTANT]
+> Tandem has announced that t:connect will be shut down in favor of Tandem Source in the US beginning September 30, 2024.
+> tconnectsync has undergone major changes to support Tandem Source. **For Tandem Source support, you MUST upgrade to tconnectsync version 2.0 or above.**
 
 If you have a t:slim X2 pump with the companion t:connect mobile Android or iOS app, this will allow your pump bolus and basal data to be uploaded to [Nightscout](https://github.com/nightscout/cgm-remote-monitor) automatically.
 Together with a CGM uploader, such as [xDrip+](https://github.com/NightscoutFoundation/xDrip) or the official Dexcom mobile app plus Dexcom Share, this allows your CGM _and_ pump data to be automatically uploaded to Nightscout!
 
-If you have an Android phone, you can use [tconnectpatcher](https://github.com/jwoglom/tconnectpatcher) to modify the t:connect Android app to upload more frequently. By default, pump data is uploaded to Tandem's servers every hour, but with tconnectpatcher the frequency can be brought down to **as low as every five minutes**! This allows for nearly real-time (albeit not fully instantaneous) pump data updates, almost like your pump uploads data directly to Nightscout!
 
 ## How It Works
 
-At a high level, tconnectsync works by querying Tandem's undocumented APIs to receive basal and bolus data from t:connect, and then uploads that data as treatment objects to Nightscout. It contains features for checking for new Tandem pump data continuously, and updating that data along with the pump's reported IOB value to Nightscout whenever there is new data.
+At a high level, tconnectsync works by querying Tandem's undocumented APIs to receive basal and bolus data from Tandem Source, and then uploads that data as treatment objects to Nightscout. It contains features for checking for new Tandem pump data continuously, and updating that data to Nightscout whenever there is new data.
 
 When you run the program with no arguments, it performs a single cycle of the following, and exits after completion:
 
-* Queries for basal information via the t:connect ControlIQ API.
-* Queries for bolus, basal, and IOB data via the t:connect non-ControlIQ API.
-* Merges the basal information received from the two APIs. (If using ControlIQ, then basal information appears only on the ControlIQ API. If not using ControlIQ, it appears only on the legacy API.)
-* Queries Nightscout for the most recently created Temp Basal object by tconnectsync, and uploads all data newer than that.
-* Queries Nightscout for the most recently created Bolus object by tconnectsync, and uploads all data newer than that.
+* Logs in to Tandem Source
+* Fetches your list of pumps, and unless overridden by an environment variable, fetches the event data for the pump which was most recently used
+* Processes the internal pump event metadata to extract basal, bolus, CGM, and other pump event data
+* Queries Nightscout to find the most recent data which was uploaded to it for each event category
+* Uploads any missing data to Nightscout
 
-If run with the `--auto-update` flag, then the application performs the following steps:
-
-* Queries an API endpoint used only by the t:connect mobile app which returns an internal event ID, corresponding to the most recent event published by the mobile app.
-* Whenever the internal event ID changes (denoting that the mobile app uploaded new data to synchronize), perform all of the above mentioned steps to synchronize data.
+If run with the `--auto-update` flag, then the application periodically looks for new data and synchronizes it to Nightscout in a loop every few minutes.
 
 ## What Gets Synced
 
@@ -46,28 +46,23 @@ When setting up tconnectsync, you can choose to configure which synchronization 
 Here are a few examples of reasons why you might want to adjust the enabled synchronization features:
 
 * If you currently input boluses into Nightscout manually with comments, then you may wish to _disable the `BOLUS` synchronization feature_ so that there are no duplicated boluses in Nightscout.
-* If you want to see Sleep and Exercise Mode data appear in Nightscout, then you may with to _enable the `PUMP_EVENTS` synchronization feature_.
-* If you want to automatically update your Nightscout insulin profile settings from your pump, then you may want to _enable the `PROFILES` synchronization feature_.
+* If you want to see Sleep and Exercise Mode data appear in Nightscout, then you may wish to _enable the `PUMP_EVENTS` synchronization feature_.
+* If you want to automatically update your Nightscout insulin profile settings from your pump, then you may wish to _enable the `PROFILES` synchronization feature_.
 
 These synchronization features are enabled by default:
 
 * `BASAL`: Basal data
 * `BOLUS`: Bolus data
+* `PUMP_EVENTS`: Events reported by the pump. Includes support for the following:
+  * Alarms, like cartridge out-of-insulin or pump malfunction
+  * Basal suspension (user or pump-initiated) and resume
+  * Cartridge, cannula, and tubing filled
+  * Sleep and exercise modes
+* `PROFILES`: Insulin profile information, including segments, basal rates, correction factors, carb ratios, and the profile which is active.
 
 The following synchronization features can be optionally enabled:
+* `CGM`: Adds Dexcom CGM readings from the pump to Nightscout as SGV (sensor glucose value) entries. This should only be used in a situation where xDrip/Dexcom Share/etc. is not used and the pump connection to the CGM will be the only source of CGM data to Nightscout. **THIS WILL DELIVER CGM DATA WITH A SIGNIFICANT (>30 MINUTE) LAG AND SHOULD NOT BE USED AS A REPLACEMENT FOR DEXCOM SHARE OR OTHER REAL TIME MONITORING.**
 
-* `PROFILES`: Insulin profile information, including segments, basal rates, correction factors, carb ratios, and the profile which is active.
-* `PUMP_EVENTS`: Events reported by the pump. Includes support for the following:
-  * Site/Cartridge Change (occurs for both a site change and a cartridge change)
-  * Empty Cartridge/Pump Shutdown (from my investigation, occurs either when the cartridge runs out of insulin OR you hard-shut off the pump)
-  * User Suspended (occurs when you manually disable insulin delivery)
-  * Exercise Mode (in Nightscout, appears with a start and end time)
-  * Sleep Mode (in Nightscout, appears with a start and end time)
-* `IOB`: Insulin-on-board data. Only the most recent IOB entry is saved to Nightscout, as an "activity". The Nightscout UI does not currently display this information. In order to read this value, you need to query the Nightscout activity API endpoint. If you don't know what that means, then there is no reason to enable this option.
-
-The following synchronization features are considered to be in alpha, and haven't been widely tested. If you want to use them, [set `ENABLE_TESTING_MODES=true` for them to show up](https://github.com/jwoglom/tconnectsync/blob/master/tconnectsync/features.py#L29):
-* `BOLUS_BG`: Adds BG readings which are associated with boluses on the pump into the Nightscout treatment object. It will determine whether the BG reading was automatically filled via the Dexcom connection on the pump or was manually entered by seeing if the BG reading matches the current CGM reading as known to the pump at that time. Support for this is nearly complete.
-* `CGM`: Adds Dexcom CGM readings from the pump to Nightscout as SGV (sensor glucose value) entries. This should only be used in a situation where xDrip/Dexcom Share/etc. is not used and the pump connection to the CGM will be the only source of CGM data to Nightscout. This requires additional testing before it should be considered ready.
 
 To specify custom synchronization features, pass the names of the desired features to the `--features` flag, e.g.:
 
@@ -104,8 +99,8 @@ You should specify the following parameters:
 TCONNECT_EMAIL='email@email.com'
 TCONNECT_PASSWORD='password'
 
-# Your pump's serial number (numeric)
-PUMP_SERIAL_NUMBER=11111111
+# OPTIONAL: Your region (US or EU)
+TCONNECT_REGION=US
 
 # URL of your Nightscout site
 NS_URL='https://yournightscouturl/'
@@ -114,6 +109,10 @@ NS_SECRET='apisecret'
 
 # Current timezone of the pump
 TIMEZONE_NAME='America/New_York'
+
+# OPTIONAL: Your pump's serial number (numeric)
+PUMP_SERIAL_NUMBER=11111111
+
 ```
 
 This file contains your t:connect username and password, Tandem pump serial number (which is utilized in API calls to t:connect), your Nightscout URL and secret token (for uploading data to Nightscout), and local timezone (the timezone used in t:connect). When specifying the timezone, enter a [TZ database name value](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
@@ -129,10 +128,10 @@ First, ensure that you have **Python 3** with **Pip** installed:
 * **On MacOS:** Open Terminal. Install [Homebrew](https://brew.sh/), and then run `brew install python3`
 * **On Linux:** Follow your distribution's specific instructions.
   - For Debian/Ubuntu based distros, `sudo apt install python3 python3-pip`
-  - For CentOS/Rocky Linux 8: 
+  - For CentOS/Rocky Linux 8:
     - `sudo dnf install python39-pip`
-    - `sudo alternatives --set python /usr/bin/python3.9` 
-* **On Windows:** 
+    - `sudo alternatives --set python /usr/bin/python3.9`
+* **On Windows:**
   - **With WSL:** Install Ubuntu under the [Windows Subsystem for Linux](https://ubuntu.com/wsl).
     Open the Ubuntu Terminal, then run `sudo apt install python3 python3-pip`.
     Perform the remainder of the steps under the Ubuntu environment.
@@ -392,6 +391,36 @@ An example `run.sh` if you built tconnectsync locally:
 docker run tconnectsync --auto-update
 ```
 
+#### Tuning Auto-Update
+
+These optional environment variables control how `--auto-update` polls and how
+it behaves when things go wrong. The defaults are sensible; you generally only
+need these if you are seeing too many (or too few) restarts.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `AUTOUPDATE_DEFAULT_SLEEP_SECONDS` | `300` | Poll interval when no better estimate is available. Also the ceiling for the retry backoff below. |
+| `AUTOUPDATE_MAX_SLEEP_SECONDS` | `1500` | Upper bound on the adaptive poll interval, regardless of how rarely new data appears. |
+| `AUTOUPDATE_UNEXPECTED_NO_INDEX_SLEEP_SECONDS` | `60` | How long to wait when new data is overdue based on the pump's previous cadence. |
+| `AUTOUPDATE_USE_FIXED_SLEEP` | `false` | Set true to always sleep `AUTOUPDATE_DEFAULT_SLEEP_SECONDS` instead of adapting to the pump's observed upload cadence. |
+| `AUTOUPDATE_API_FAILURE_MINUTES` | `45` | Exit with a non-zero code after this many minutes of unbroken API/network failure, so your container platform restarts tconnectsync and can alert you. Set `0` to never exit. |
+| `AUTOUPDATE_NO_DATA_FAILURE_MINUTES` | `180` | Log an error if the pump has not reported new events for this long. Usually means the pump simply is not uploading. |
+| `AUTOUPDATE_FAILURE_MINUTES` | `75` | Log an error if events are appearing but no data has synced successfully for this long. |
+| `AUTOUPDATE_RESTART_ON_FAILURE` | `false` | Whether the two watchdogs above also exit non-zero. Independent of `AUTOUPDATE_API_FAILURE_MINUTES`. |
+| `AUTOUPDATE_MAX_LOOP_INVOCATIONS` | `-1` | Stop after this many poll cycles. `-1` means run forever; mainly useful for testing. |
+
+**On failures and restarts.** Transient errors (DNS blips, timeouts, HTTP 404/502/503
+from Tandem) do not crash tconnectsync. It retries with a growing backoff — 30s,
+60s, 120s, 240s, then holding at `AUTOUPDATE_DEFAULT_SLEEP_SECONDS` — and resets
+as soon as a poll succeeds. Staying in-process matters: an exit discards the
+cached credentials, so a restart loop means a fresh login on every attempt,
+which risks tripping Tandem's rate limiting.
+
+Only once the API has been failing continuously for `AUTOUPDATE_API_FAILURE_MINUTES`
+does tconnectsync give up and exit, so that a genuine outage surfaces (roughly one
+restart per hour) instead of disappearing into an endless quiet retry. Invalid
+credentials are never retried — they exit immediately, since retrying cannot help.
+
 ### Running with Cron
 
 If you choose not to run tconnectsync with `--auto-update` continuously,
@@ -414,7 +443,7 @@ An example of a user crontab `crontab -e` if not running system-wide, which runs
 
 You can use one of the same `run.sh` files referenced above, but remove the `--auto-update` flag since you are handling the functionality for running the script periodically yourself.
 
-### For Native Windows 
+### For Native Windows
 
 Create a batch file 'tconnectsync.bat' file containing:
 
@@ -430,13 +459,11 @@ If main.py doesn't exist in `C:\Users\<USERNAME>\AppData\Local\Programs\Python\<
 
 ## Tandem APIs
 
-This application utilizes three separate Tandem APIs for obtaining t:connect data, referenced here by the identifying part of their URLs:
+As of version 2.0, tconnectsync retrieves all of its data from a single Tandem API, [**tandemsource**](https://github.com/jwoglom/tconnectsync/blob/master/tconnectsync/api/tandemsource.py), which powers [Tandem Source](https://source.tandemdiabetes.com/). After logging in, tconnectsync fetches the list of pumps on the account along with a stream of raw pump event data, which is decoded locally (see [`tconnectsync/eventparser`](https://github.com/jwoglom/tconnectsync/tree/master/tconnectsync/eventparser)) to extract basal, bolus, CGM, and other pump events.
 
-* [**controliq**](https://github.com/jwoglom/tconnectsync/blob/master/tconnectsync/api/controliq.py) - Contains Control:IQ related data, namely a timeline of all Basal events uploaded by the pump, separated by type (temp basals, algorithmically-updated basals, or profile-updated basals). Additionally includes CGM and Bolus data.
-* [**android**](https://github.com/jwoglom/tconnectsync/blob/master/tconnectsync/api/android.py) - Used internally by the t:connect Android app, these API endpoints were discovered by reverse-engineering the Android app. Most of the API endpoints are used for uploading pump data, and tconnectsync uses one endpoint which returns the most recent event ID uploaded by the pump, so we know when more data has been uploaded.
-* [**tconnectws2**](https://github.com/jwoglom/tconnectsync/blob/master/tconnectsync/api/ws2.py) - More legacy than the others, this seems to power the bulk of the main t:connect website. It is used as a last resort due to severe performance issues with this API (see https://github.com/jwoglom/tconnectsync/issues/43). We can use it to retrieve a CSV export of non-ControlIQ basal data, as well as bolus and IOB data. It is only used for bolus data as a fallback, and for pump-reported IOB data if requested. Full tracking of pump events also uses a limited version of this API.
+> Earlier versions of tconnectsync (1.x) instead used three separate legacy t:connect APIs (`controliq`, `android`, and `tconnectws2`). Those APIs — and the code supporting them — were removed once t:connect was shut down in favor of Tandem Source.
 
-I have only tested tconnectsync with a Tandem pump set in the US Eastern timezone. Tandem's (to us, undocumented) APIs are [a bit loose with timezones](https://github.com/jwoglom/tconnectsync/blob/master/tconnectsync/parser.py#L15), so please let me know if you notice any timezone-related bugs.
+I have only tested tconnectsync with a Tandem pump set in the US Eastern timezone. Tandem's (to us, undocumented) APIs are a bit loose with timezones, so please let me know if you notice any timezone-related bugs.
 ## Backfilling t:connect Data
 
 To backfill existing t:connect data in to Nightscout, you can use the `--start-date` and `--end-date` options. For example, the following will upload all t:connect data between January 1st and March 1st, 2020 to Nightscout:
@@ -449,14 +476,14 @@ In order to bulk-import a lot of data, you may need to use shorter intervals, an
 
 One oddity when backfilling data is that the Control:IQ specific API endpoints return errors if they are queried before you updated your pump to utilize Control:IQ. This is [partially worked around in tconnectsync's code](https://github.com/jwoglom/tconnectsync/blob/d841c3811aeff3671d941a7d3ff4b80cce6a219e/main.py#L238), but you might need to update the logic if you did not switch to a Control:IQ enabled pump immediately after launch.
 
-## t:connect API Testing
+## Tandem Source API Testing
 
-To test t:connect API endpoints in a Python shell, you can do something like the following:
+To test Tandem Source API endpoints in a Python shell, you can do something like the following:
 
 ```python
 import tconnectsync
 tconnectsync.util.cli.enable_logging()
 api = tconnectsync.util.cli.get_api()
 # Make API calls, e.g.
-therapy_timeline = api.controliq.therapy_timeline('2022-08-01', '2022-08-10')
+pumps = api.tandemsource.pump_event_metadata()
 ```

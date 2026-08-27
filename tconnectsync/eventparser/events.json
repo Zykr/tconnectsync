@@ -1,0 +1,2303 @@
+{
+  "events": {
+    "3": {
+      "name": "LID_BASAL_RATE_CHANGE",
+      "data": {
+        "commandedBasalRate": {
+          "type": "float32",
+          "offset": 0,
+          "uom": "units/hour"
+        },
+        "baseBasalRate": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units/hour"
+        },
+        "maxBasalRate": {
+          "type": "float32",
+          "offset": 8,
+          "uom": "units/hour"
+        },
+        "idp": {
+          "type": "uint16",
+          "offset": 14
+        },
+        "changeType": {
+          "type": "uint8",
+          "offset": 13,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "\"timed segment\" - change by timed segment (because either the segment advanced based on time, the user changed the pump time, the user changed the active segment or changed by an AID algorithm.)",
+                "1": "\"new profile\" - change by activation of new profile",
+                "2": "\"temp rate start\"",
+                "3": "\"temp rate end\"",
+                "4": "\"pump suspended\"",
+                "5": "\"pump resumed\"",
+                "6": "“pump shut down”",
+                "7": "“basal limit”"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "4": {
+      "name": "LID_ALERT_ACTIVATED",
+      "data": {
+        "alertId": {
+          "type": "uint32",
+          "offset": 0,
+          "transform": [
+            [
+              "dictionary",
+              "alerts"
+            ]
+          ]
+        },
+        "faultLocatorData": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "param1": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "param2": {
+          "type": "float32",
+          "offset": 12
+        }
+      }
+    },
+    "5": {
+      "name": "LID_ALARM_ACTIVATED",
+      "data": {
+        "alarmId": {
+          "type": "uint32",
+          "offset": 0,
+          "transform": [
+            [
+              "dictionary",
+              "alarms"
+            ]
+          ]
+        },
+        "faultLocatorData": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "param1": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "param2": {
+          "type": "float32",
+          "offset": 12
+        }
+      }
+    },
+    "6": {
+      "name": "LID_MALFUNCTION_ACTIVATED",
+      "data": {
+        "malfId": {
+          "type": "uint32",
+          "offset": 0,
+          "transform": [
+            [
+              "dictionary",
+              "malfs"
+            ]
+          ]
+        },
+        "faultLocatorData": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "param1": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "param2": {
+          "type": "float32",
+          "offset": 12
+        }
+      }
+    },
+    "11": {
+      "name": "LID_PUMPING_SUSPENDED",
+      "data": {
+        "preSuspendState": {
+          "type": "uint32",
+          "offset": 0
+        },
+        "insulinAmount": {
+          "type": "uint16",
+          "offset": 6,
+          "uom": "units"
+        },
+        "suspendReason": {
+          "type": "uint8",
+          "offset": 5,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "User Aborted",
+                "1": "Terminated by Alarm",
+                "2": "Terminated by Malfunction",
+                "6": "Auto Suspend by PLGS"
+              }
+            ]
+          ]
+        },
+        "rpaTimeout": {
+          "type": "uint8",
+          "offset": 4,
+          "uom": "minutes"
+        }
+      }
+    },
+    "12": {
+      "name": "LID_PUMPING_RESUMED",
+      "data": {
+        "preResumeState": {
+          "type": "uint32",
+          "offset": 0
+        },
+        "insulinAmount": {
+          "type": "uint16",
+          "offset": 6,
+          "uom": "units"
+        }
+      }
+    },
+    "13": {
+      "name": "LID_TIME_CHANGED",
+      "data": {
+        "timePrior": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "ms"
+        },
+        "timeAfter": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "ms"
+        },
+        "rawRtcTime": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "ms"
+        }
+      }
+    },
+    "14": {
+      "name": "LID_DATE_CHANGED",
+      "data": {
+        "datePrior": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "day"
+        },
+        "dateAfter": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "day"
+        },
+        "rawRtcTime": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "ms"
+        }
+      }
+    },
+    "16": {
+      "name": "LID_BG_READING_TAKEN",
+      "data": {
+        "selectedIob": {
+          "type": "uint8",
+          "offset": 15,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Mudaliar IOB",
+                "1": "Swan IOB Meal"
+              }
+            ]
+          ]
+        },
+        "bg": {
+          "type": "uint16",
+          "offset": 2,
+          "uom": "mg/dL"
+        },
+        "bgEntryType": {
+          "type": "uint8",
+          "offset": 0,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Manual Entry by the User via Numpad",
+                "1": "Auto Populated BG using Dexcom EGV"
+              }
+            ]
+          ]
+        },
+        "iob": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units"
+        },
+        "targetBg": {
+          "type": "uint16",
+          "offset": 10,
+          "uom": "mg/dL"
+        },
+        "isf": {
+          "type": "uint16",
+          "offset": 8,
+          "uom": "(mg/dL)/unit"
+        },
+        "bgSourceType": {
+          "type": "uint8",
+          "offset": 14,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Local Pump entry",
+                "1": "Remote entry"
+              }
+            ]
+          ]
+        },
+        "cgmCalibration": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "No, it was not used to Calibrate.",
+                "1": "Yes, it was used to calibrate."
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "20": {
+      "name": "LID_BOLUS_COMPLETED",
+      "data": {
+        "completionStatus": {
+          "type": "uint16",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "User Aborted",
+                "1": "Terminated by Alarm",
+                "2": "Terminated by Malfunction",
+                "3": "Completed",
+                "4": "Reserved - Used in non-commercial software",
+                "5": "Bolus rejected",
+                "6": "Aborted by PLGS",
+                "7": "Reserved",
+                "8": "Reserved - For future use"
+              }
+            ]
+          ]
+        },
+        "bolusId": {
+          "type": "uint16",
+          "offset": 0
+        },
+        "insulinDelivered": {
+          "type": "float32",
+          "offset": 8,
+          "uom": "units"
+        },
+        "insulinRequested": {
+          "type": "float32",
+          "offset": 12,
+          "uom": "units"
+        },
+        "iob": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units"
+        }
+      }
+    },
+    "21": {
+      "name": "LID_BOLEX_COMPLETED",
+      "data": {
+        "completionStatus": {
+          "type": "uint16",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "User Aborted",
+                "1": "Terminated by Alarm",
+                "2": "Terminated by Malfunction",
+                "3": "Completed",
+                "4": "Reserved - Used in non-commercial software",
+                "5": "Bolus rejected",
+                "6": "Aborted by PLGS",
+                "7": "Reserved",
+                "8": "Reserved - For future use"
+              }
+            ]
+          ]
+        },
+        "bolusId": {
+          "type": "uint16",
+          "offset": 0
+        },
+        "insulinDelivered": {
+          "type": "float32",
+          "offset": 8,
+          "uom": "units"
+        },
+        "insulinRequested": {
+          "type": "float32",
+          "offset": 12,
+          "uom": "units"
+        },
+        "iob": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units"
+        }
+      }
+    },
+    "26": {
+      "name": "LID_ALERT_CLEARED",
+      "data": {
+        "alertId": {
+          "type": "uint32",
+          "offset": 0,
+          "transform": [
+            [
+              "dictionary",
+              "alerts"
+            ]
+          ]
+        },
+        "faultLocatorData": {
+          "type": "uint32",
+          "offset": 4
+        }
+      }
+    },
+    "28": {
+      "name": "LID_ALARM_CLEARED",
+      "data": {
+        "alarmId": {
+          "type": "uint32",
+          "offset": 0,
+          "transform": [
+            [
+              "dictionary",
+              "alarms"
+            ]
+          ]
+        }
+      }
+    },
+    "33": {
+      "name": "LID_CARTRIDGE_FILLED",
+      "data": {
+        "insulinVolume": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "units"
+        },
+        "v2Volume": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units"
+        }
+      }
+    },
+    "53": {
+      "name": "LID_SHELF_MODE",
+      "data": {
+        "msecSinceReset": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "ms"
+        },
+        "liPoCurrent": {
+          "type": "int16",
+          "offset": 6,
+          "uom": "mA"
+        },
+        "liPoAbc": {
+          "type": "uint8",
+          "offset": 5,
+          "uom": "%"
+        },
+        "liPoIbc": {
+          "type": "uint8",
+          "offset": 4,
+          "uom": "%"
+        },
+        "liPoRemCap": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "mAh"
+        },
+        "liPoMV": {
+          "type": "uint32",
+          "offset": 12,
+          "uom": "mV"
+        }
+      }
+    },
+    "55": {
+      "name": "LID_BOLUS_ACTIVATED",
+      "data": {
+        "selectedIob": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Mudaliar IOB",
+                "1": "Swan IOB Meal"
+              }
+            ]
+          ]
+        },
+        "bolusId": {
+          "type": "uint16",
+          "offset": 2
+        },
+        "iob": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units"
+        },
+        "bolusSize": {
+          "type": "float32",
+          "offset": 8,
+          "uom": "units"
+        }
+      }
+    },
+    "59": {
+      "name": "LID_BOLEX_ACTIVATED",
+      "data": {
+        "selectedIob": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Mudaliar IOB",
+                "1": "Swan IOB Meal"
+              }
+            ]
+          ]
+        },
+        "bolusId": {
+          "type": "uint16",
+          "offset": 2
+        },
+        "iob": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units"
+        },
+        "bolexSize": {
+          "type": "float32",
+          "offset": 8,
+          "uom": "units"
+        }
+      }
+    },
+    "60": {
+      "name": "LID_DATA_LOG_CORRUPTION",
+      "data": {
+        "block": {
+          "type": "uint32",
+          "offset": 0
+        },
+        "reason": {
+          "type": "uint8",
+          "offset": 7
+        }
+      }
+    },
+    "61": {
+      "name": "LID_CANNULA_FILLED",
+      "data": {
+        "primeSize": {
+          "type": "float32",
+          "offset": 0,
+          "uom": "units"
+        },
+        "completionStatus": {
+          "type": "uint32",
+          "offset": 4,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "User Aborted",
+                "1": "Terminated by Alarm",
+                "2": "Terminated by Malfunction",
+                "3": "Completed"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "63": {
+      "name": "LID_TUBING_FILLED",
+      "data": {
+        "primeSize": {
+          "type": "float32",
+          "offset": 0,
+          "uom": "units"
+        },
+        "completionStatus": {
+          "type": "uint32",
+          "offset": 4,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "User Aborted",
+                "1": "Terminated by Alarm",
+                "2": "Terminated by Malfunction",
+                "3": "Completed"
+              }
+            ]
+          ]
+        },
+        "position": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "counts"
+        }
+      }
+    },
+    "64": {
+      "name": "LID_BOLUS_REQUESTED_MSG1",
+      "data": {
+        "bolusId": {
+          "type": "uint16",
+          "offset": 2
+        },
+        "bolusType": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Insulin",
+                "1": "Carb",
+                "2": "Automatic Correction",
+                "3": "Remote"
+              }
+            ]
+          ]
+        },
+        "correctionBolusIncluded": {
+          "type": "uint8",
+          "offset": 0,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "No",
+                "1": "Yes"
+              }
+            ]
+          ]
+        },
+        "carbAmount": {
+          "type": "uint16",
+          "offset": 6,
+          "uom": "grams"
+        },
+        "bg": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "mg/dL"
+        },
+        "carbRatio": {
+          "type": "uint32",
+          "offset": 12,
+          "transform": [
+            [
+              "ratio",
+              0.001
+            ]
+          ],
+          "uom": "g/u"
+        },
+        "iob": {
+          "type": "float32",
+          "offset": 8,
+          "uom": "units"
+        }
+      }
+    },
+    "65": {
+      "name": "LID_BOLUS_REQUESTED_MSG2",
+      "data": {
+        "selectedIob": {
+          "type": "uint8",
+          "offset": 13,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Mudaliar IOB",
+                "1": "Swan IOB Meal"
+              }
+            ]
+          ]
+        },
+        "bolusId": {
+          "type": "uint16",
+          "offset": 2
+        },
+        "options": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Standard Bolus",
+                "1": "Extended Bolus",
+                "2": "Quick Bolus",
+                "3": "Automatic Bolus",
+                "4": "BLE Standard Bolus",
+                "5": "BLE Extended Bolus",
+                "6": "Eating Soon Automatic Bolus",
+                "7": "Late Bolus"
+              }
+            ]
+          ]
+        },
+        "standardPercent": {
+          "type": "uint8",
+          "offset": 0,
+          "uom": "%"
+        },
+        "duration": {
+          "type": "uint16",
+          "offset": 6,
+          "uom": "minutes"
+        },
+        "isf": {
+          "type": "uint16",
+          "offset": 10,
+          "uom": "(mg/dL)/unit"
+        },
+        "targetBg": {
+          "type": "uint16",
+          "offset": 8,
+          "uom": "mg/dL"
+        },
+        "userOverride": {
+          "type": "uint8",
+          "offset": 15,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "\"No\", user did not override the bolus size",
+                "1": "\"Yes\", user did override the bolus size"
+              }
+            ]
+          ]
+        },
+        "declinedCorrection": {
+          "type": "uint8",
+          "offset": 14,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "\"No\", user did not decline the recommended correction",
+                "1": "\"Yes\", user declined the recommended correction"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "66": {
+      "name": "LID_BOLUS_REQUESTED_MSG3",
+      "data": {
+        "bolusId": {
+          "type": "uint16",
+          "offset": 2
+        },
+        "foodBolusSize": {
+          "type": "float32",
+          "offset": 4,
+          "uom": "units"
+        },
+        "correctionBolusSize": {
+          "type": "float32",
+          "offset": 8,
+          "uom": "units"
+        },
+        "totalBolusSize": {
+          "type": "float32",
+          "offset": 12,
+          "uom": "units"
+        }
+      }
+    },
+    "90": {
+      "name": "LID_NEW_DAY",
+      "data": {
+        "commandedBasalRate": {
+          "type": "float32",
+          "offset": 0,
+          "uom": "units/hour"
+        },
+        "featuresBitmask": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "featureBitmaskIndex": {
+          "type": "uint32",
+          "offset": 8
+        }
+      }
+    },
+    "99": {
+      "name": "LID_ARM_INIT",
+      "data": {
+        "version": {
+          "type": "uint32",
+          "offset": 0
+        },
+        "configABits": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "configBBits": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "numLogEntries": {
+          "type": "uint32",
+          "offset": 12
+        }
+      }
+    },
+    "140": {
+      "name": "LID_PLGS_PERIODIC",
+      "data": {
+        "timestamp": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "fmr": {
+          "type": "uint16",
+          "offset": 6,
+          "uom": "mg/dL"
+        },
+        "pgv": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "mg/dL"
+        },
+        "fmrStatus": {
+          "type": "uint8",
+          "offset": 11,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "No FMR",
+                "1": "Periodic glucose reading",
+                "2": "Calibration response glucose reading",
+                "3": "Sensor session stopped (no FMR)",
+                "4": "Sensor session started (no FMR)",
+                "5": "Calibration entered (no FMR)",
+                "6": "Pumping event (no FMR)"
+              }
+            ]
+          ]
+        },
+        "pgvValid": {
+          "type": "uint8",
+          "offset": 10,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "FALSE",
+                "1": "TRUE"
+              }
+            ]
+          ]
+        },
+        "ruleState": {
+          "type": "uint8",
+          "offset": 9,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "HO_SUSPEND_RULE",
+                "1": "HO_RECOVERY_RULE",
+                "2": "HO_UNAVAILABLE_RULE"
+              }
+            ]
+          ]
+        },
+        "hoMinState": {
+          "type": "uint8",
+          "offset": 8,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "On and available",
+                "1": "On and suspended",
+                "2": "Off",
+                "3": "On and not available"
+              }
+            ]
+          ]
+        },
+        "status": {
+          "type": "uint32",
+          "offset": 12,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Suspend Predicted",
+                "1": "Suspend Current",
+                "2": "Unused",
+                "3": "Unused",
+                "4": "Resume EGV Rise",
+                "5": "Unused",
+                "6": "Resume Nadir Lock",
+                "7": "Unavailable - Time Small",
+                "8": "Unavailable - Suspend Override",
+                "9": "Unavailable - CGM Off",
+                "10": "Unavailable - High EGV",
+                "11": "Unavailable - Not Therapy",
+                "12": "Unavailable - Bolus Active",
+                "13": "Unavailable - No Current"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "171": {
+      "name": "LID_CGM_ALERT_ACTIVATED",
+      "data": {
+        "dalertId": {
+          "type": "uint32",
+          "offset": 0,
+          "transform": [
+            [
+              "dictionary",
+              "dalerts"
+            ]
+          ]
+        },
+        "faultLocatorData": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "param1": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "param2": {
+          "type": "float32",
+          "offset": 12
+        }
+      }
+    },
+    "172": {
+      "name": "LID_CGM_ALERT_CLEARED",
+      "data": {
+        "dalertId": {
+          "type": "uint32",
+          "offset": 0,
+          "transform": [
+            [
+              "dictionary",
+              "dalerts"
+            ]
+          ]
+        }
+      }
+    },
+    "191": {
+      "name": "LID_VERSION_INFO",
+      "data": {
+        "version": {
+          "type": "uint32",
+          "offset": 0
+        },
+        "configABits": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "configBBits": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "armCrc": {
+          "type": "uint16",
+          "offset": 14
+        }
+      }
+    },
+    "203": {
+      "name": "LID_UPDATE_STATUS",
+      "data": {
+        "swUpdateStatus": {
+          "type": "uint16",
+          "offset": 2
+        },
+        "metadataAndVersionStatus": {
+          "type": "uint16",
+          "offset": 0
+        },
+        "fullDlAndCrcStatus": {
+          "type": "uint16",
+          "offset": 6
+        },
+        "fileDlAndSideloadStatus": {
+          "type": "uint16",
+          "offset": 4
+        },
+        "externalFlashStatus": {
+          "type": "uint16",
+          "offset": 10
+        },
+        "updateSuccessful": {
+          "type": "uint8",
+          "offset": 9,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Update Not Successful",
+                "1": "Update Successful"
+              }
+            ]
+          ]
+        },
+        "swPartNum": {
+          "type": "uint32",
+          "offset": 12
+        }
+      }
+    },
+    "212": {
+      "name": "LID_CGM_START_SESSION_GX",
+      "data": {
+        "currentTransmitterTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 15,
+          "uom": "days"
+        }
+      }
+    },
+    "213": {
+      "name": "LID_CGM_JOIN_SESSION_GX",
+      "data": {
+        "currentTransmitterTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 15,
+          "uom": "days"
+        },
+        "sessionJoinReason": {
+          "type": "uint8",
+          "offset": 14,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "DEXBLES_REASON_USER,",
+                "1": "DEXBLES_REASON_UNKNOWN,",
+                "2": "Reserved,",
+                "3": "DEXBLES_REASON_TX_END_OF_LIFE,",
+                "4": "DEXBLES_REASON_TRANSMITTER_ERROR,",
+                "5": "DEXBLES_REASON_SESSION_STOP_SUCCESS,",
+                "6": "DEXBLES_REASON_TRANSMITTER_NOT_IN_SESSION,",
+                "7": "Reserved",
+                "8": "DEXBLES_REASON_NEW_SESSION_STARTED_SUCCESS,",
+                "9": "DEXBLES_REASON_SESSION_STARTED_IN_PROGRESS,",
+                "10": "DEXBLES_REASON_TRANSMITTER_IN_SESSION,",
+                "11": "DEXBLES_REASON_BLESTACK_INVALID,",
+                "12": "DEXBLES_REASON_NEW_AUTOCAL_SESSION_STARTED_SUCCESS,",
+                "13": "DEXBLES_REASON_NO_AUTOCAL_SESSION_IN_PROGRESS"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "214": {
+      "name": "LID_CGM_STOP_SESSION_GX",
+      "data": {
+        "currentTransmitterTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "sec"
+        },
+        "sessionStopTime": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 15,
+          "uom": "days"
+        },
+        "sessionStopReason": {
+          "type": "uint8",
+          "offset": 14,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "DEXBLES_REASON_USER,",
+                "1": "DEXBLES_REASON_UNKNOWN,",
+                "2": "Reserved,",
+                "3": "DEXBLES_REASON_TX_END_OF_LIFE,",
+                "4": "DEXBLES_REASON_TRANSMITTER_ERROR,",
+                "5": "DEXBLES_REASON_SESSION_STOP_SUCCESS,",
+                "6": "DEXBLES_REASON_TRANSMITTER_NOT_IN_SESSION,",
+                "7": "Reserved",
+                "8": "DEXBLES_REASON_NEW_SESSION_STARTED_SUCCESS,",
+                "9": "DEXBLES_REASON_SESSION_STARTED_IN_PROGRESS,",
+                "10": "DEXBLES_REASON_TRANSMITTER_IN_SESSION,",
+                "11": "DEXBLES_REASON_BLESTACK_INVALID,",
+                "12": "DEXBLES_REASON_NEW_AUTOCAL_SESSION_STARTED_SUCCESS,",
+                "13": "DEXBLES_REASON_NO_AUTOCAL_SESSION_IN_PROGRESS"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "229": {
+      "name": "LID_AA_USER_MODE_CHANGE",
+      "data": {
+        "exerciseChoice": {
+          "type": "uint8",
+          "offset": 10,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Continuous",
+                "1": "Timed"
+              }
+            ]
+          ]
+        },
+        "exerciseTime": {
+          "type": "uint16",
+          "offset": 8,
+          "uom": "minutes"
+        },
+        "currentUserMode": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Normal",
+                "1": "Sleeping",
+                "2": "Exercising",
+                "3": "Eating Soon"
+              }
+            ]
+          ]
+        },
+        "previousUserMode": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Normal",
+                "1": "Sleeping",
+                "2": "Exercising",
+                "3": "Eating Soon"
+              }
+            ]
+          ]
+        },
+        "requestedAction": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "No User Request",
+                "1": "Start Sleep",
+                "2": "Stop Sleep",
+                "3": "Start Exercise",
+                "4": "Stop Exercise",
+                "5": "Stop All",
+                "6": "Start Eating Soon",
+                "7": "Stop Eating Soon"
+              }
+            ]
+          ]
+        },
+        "sleepStartedByGui": {
+          "type": "uint8",
+          "offset": 7,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "FALSE",
+                "1": "TRUE"
+              }
+            ]
+          ]
+        },
+        "exerciseStoppedByTimer": {
+          "type": "uint8",
+          "offset": 11,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "False",
+                "1": "True"
+              }
+            ]
+          ]
+        },
+        "activeSleepSchedule": {
+          "type": "uint8",
+          "offset": 6,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Sleep Schedule 1 is Active",
+                "1": "Sleep Schedule 2 is Active",
+                "2": "Sleep Schedule 3 is Active",
+                "3": "Sleep Schedule 4 is Active"
+              }
+            ]
+          ]
+        },
+        "eatingSoonStoppedByTimer": {
+          "type": "uint8",
+          "offset": 15,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "False",
+                "1": "True"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "230": {
+      "name": "LID_AA_PCM_CHANGE",
+      "data": {
+        "currentPcm": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "No Control",
+                "1": "Open Loop",
+                "2": "Pining",
+                "3": "Closed Loop"
+              }
+            ]
+          ]
+        },
+        "previousPcm": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "No Control",
+                "1": "Open Loop",
+                "2": "Pining",
+                "3": "Closed Loop"
+              }
+            ]
+          ]
+        },
+        "pumpSuspended": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "FALSE",
+                "1": "TRUE"
+              }
+            ]
+          ]
+        },
+        "calculationAvailable": {
+          "type": "uint8",
+          "offset": 0,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "FALSE",
+                "1": "TRUE"
+              }
+            ]
+          ]
+        },
+        "cgmAvailable": {
+          "type": "uint8",
+          "offset": 7,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "FALSE",
+                "1": "TRUE"
+              }
+            ]
+          ]
+        },
+        "closedLoopPreferred": {
+          "type": "uint8",
+          "offset": 6,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "FALSE",
+                "1": "TRUE"
+              }
+            ]
+          ]
+        },
+        "sufficientClosedLoopParams": {
+          "type": "uint8",
+          "offset": 5,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "FALSE",
+                "1": "TRUE"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "256": {
+      "name": "LID_CGM_DATA_GXB",
+      "data": {
+        "glucoseValueStatus": {
+          "type": "uint16",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "\"currentGlucoseDisplayValue\" contains the glucose reading",
+                "1": "The glucose reading is \"high\", \"currentGlucoseDisplayValue\" set to 0",
+                "2": "The glucose reading is \"low\", \"currentGlucoseDisplayValue\" set to 0"
+              }
+            ]
+          ]
+        },
+        "cgmDataType": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Five Minute Reading (FMR)",
+                "1": "BackFill",
+                "2": "Immediate Match Value",
+                "3": "Calibration",
+                "4": "None"
+              }
+            ]
+          ]
+        },
+        "rate": {
+          "type": "int8",
+          "offset": 0,
+          "transform": [
+            [
+              "ratio",
+              0.1
+            ]
+          ],
+          "uom": "mg/dL/min"
+        },
+        "algorithmState": {
+          "type": "uint8",
+          "offset": 7
+        },
+        "rssi": {
+          "type": "int8",
+          "offset": 6,
+          "uom": "dBm"
+        },
+        "currentGlucoseDisplayValue": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "mg/dL"
+        },
+        "egvTimeStamp": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "sec"
+        },
+        "egvInfoBitmask": {
+          "type": "uint16",
+          "offset": 14,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Five Minute Reading (FMR)",
+                "1": "Backfill",
+                "2": "Immediate match value",
+                "3": "CRR (EGV is result of calibration, bit:14 was set to 1)",
+                "4": "NO_EGV message",
+                "5": "Valid timestamp",
+                "6": "Valid EGV (valid range)",
+                "7": "Valid algState (algState is 6, 7, or 14)",
+                "8": "EGV was successfully added to CGM subsystem array (e.g.,"
+              }
+            ]
+          ]
+        },
+        "interval": {
+          "type": "uint8",
+          "offset": 13
+        }
+      }
+    },
+    "279": {
+      "name": "LID_BASAL_DELIVERY",
+      "data": {
+        "commandedRateSource": {
+          "type": "uint16",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Suspended",
+                "1": "Profile",
+                "2": "Temp Rate",
+                "3": "Algorithm",
+                "4": "Temp Rate and Algorithm"
+              }
+            ]
+          ]
+        },
+        "commandedRate": {
+          "type": "uint16",
+          "offset": 6,
+          "uom": "milliunits/hr"
+        },
+        "profileBasalRate": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "milliunits/hr"
+        },
+        "algorithmRate": {
+          "type": "uint16",
+          "offset": 10,
+          "uom": "milliunits/hr"
+        },
+        "tempRate": {
+          "type": "uint16",
+          "offset": 8,
+          "uom": "milliunits/hr"
+        }
+      }
+    },
+    "280": {
+      "name": "LID_BOLUS_DELIVERY",
+      "data": {
+        "bolusId": {
+          "type": "uint16",
+          "offset": 2
+        },
+        "bolusDeliveryStatus": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Bolus Completed",
+                "1": "Bolus Started"
+              }
+            ]
+          ]
+        },
+        "bolusType": {
+          "type": "uint8",
+          "offset": 0,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Now",
+                "1": "Later",
+                "2": "Override",
+                "3": "Correction",
+                "4": "Carb",
+                "5": "Eating Soon Mode"
+              }
+            ]
+          ]
+        },
+        "bolusSource": {
+          "type": "uint8",
+          "offset": 7,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Pump Button",
+                "1": "Pump GUI",
+                "2": "Reserved",
+                "3": "Reserved",
+                "4": "Reserved",
+                "5": "Remote",
+                "6": "Reserved",
+                "7": "Algorithm",
+                "8": "BLE",
+                "9": "Eating Soon Bolus"
+              }
+            ]
+          ]
+        },
+        "remoteId": {
+          "type": "uint8",
+          "offset": 6
+        },
+        "requestedNow": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "milliunits"
+        },
+        "requestedLater": {
+          "type": "uint16",
+          "offset": 10,
+          "uom": "milliunits"
+        },
+        "extendedDurationRequested": {
+          "type": "uint16",
+          "offset": 14,
+          "uom": "minutes"
+        },
+        "deliveredTotal": {
+          "type": "uint16",
+          "offset": 12,
+          "uom": "milliunits"
+        },
+        "correction": {
+          "type": "uint16",
+          "offset": 8,
+          "uom": "milliunits"
+        }
+      }
+    },
+    "307": {
+      "name": "LID_VERSIONS_A",
+      "data": {
+        "armPartNumber": {
+          "type": "uint32",
+          "offset": 0
+        },
+        "armSwVersion": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "blePartNumber": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "bleSwVersion": {
+          "type": "uint32",
+          "offset": 12
+        }
+      }
+    },
+    "313": {
+      "name": "LID_AA_DAILY_STATUS",
+      "data": {
+        "pumpControlState": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "PCM No Control (No cartridge installed)",
+                "1": "PCM Open Loop",
+                "2": "PCM Pining",
+                "3": "PCM Closed Loop"
+              }
+            ]
+          ]
+        },
+        "usermode": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Normal",
+                "1": "Sleeping",
+                "2": "Exercising"
+              }
+            ]
+          ]
+        },
+        "sensorType": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "CGM_TYPE_NONE",
+                "1": "CGM_TYPE_DEXCOM_G6",
+                "2": "CGM_TYPE_LIBRE2",
+                "3": "CGM_TYPE_DEXCOM_G7"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "369": {
+      "name": "LID_CGM_ALERT_ACTIVATED_DEX",
+      "data": {
+        "dalertId": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "dictionary",
+              "dalerts"
+            ]
+          ]
+        },
+        "sensorType": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Invalid",
+                "1": "CGM_TYPE_DEXCOM_G6",
+                "3": "CGM_TYPE_DEXCOM_G7"
+              }
+            ]
+          ]
+        },
+        "faultLocatorData": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "param1": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "param2": {
+          "type": "float32",
+          "offset": 12
+        }
+      }
+    },
+    "370": {
+      "name": "LID_CGM_ALERT_CLEARED_DEX",
+      "data": {
+        "dalertId": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "dictionary",
+              "dalerts"
+            ]
+          ]
+        },
+        "sensorType": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Invalid",
+                "1": "CGM_TYPE_DEXCOM_G6",
+                "3": "CGM_TYPE_DEXCOM_G7"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "371": {
+      "name": "LID_CGM_ALERT_ACK_DEX",
+      "data": {
+        "dalertId": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "dictionary",
+              "dalerts"
+            ]
+          ]
+        },
+        "sensorType": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Invalid",
+                "1": "CGM_TYPE_DEXCOM_G6",
+                "3": "CGM_TYPE_DEXCOM_G7"
+              }
+            ]
+          ]
+        },
+        "ackSource": {
+          "type": "uint32",
+          "offset": 4,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Alert Acknowledged by User",
+                "1": "Alert Acknowledged by Software"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "372": {
+      "name": "LID_CGM_DATA_FSL2",
+      "data": {
+        "glucoseValueStatus": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Precise Value",
+                "1": "Special High",
+                "2": "Special Low"
+              }
+            ]
+          ]
+        },
+        "cgmDataType": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Five Minute Reading (FMR)",
+                "1": "Backfill",
+                "4": "None",
+                "5": "One Minute Reading (OMR)",
+                "6": "Real Time Reading"
+              }
+            ]
+          ]
+        },
+        "rate": {
+          "type": "int16",
+          "offset": 0,
+          "transform": [
+            [
+              "ratio",
+              0.1
+            ]
+          ],
+          "uom": "mg/dL/min"
+        },
+        "algorithmState": {
+          "type": "uint8",
+          "offset": 7,
+          "transform": [
+            [
+              "enum",
+              {
+                "2": "Warmup",
+                "100": "OK State",
+                "101": "RF Error State",
+                "102": "Sensor Signal Low State",
+                "103": "Temp High State",
+                "104": "Temp Low State",
+                "105": "Invalid Data State",
+                "106": "Other State"
+              }
+            ]
+          ]
+        },
+        "rssi": {
+          "type": "int8",
+          "offset": 6,
+          "uom": "dBm"
+        },
+        "currentGlucoseDisplayValue": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "mg/dL"
+        },
+        "egvTimeStamp": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "Seconds"
+        },
+        "egvInfoBitmask": {
+          "type": "uint16",
+          "offset": 14,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Five Minute Reading (FMR)",
+                "1": "Backfill",
+                "2": "Immediate match value",
+                "3": "CRR (EGV is result of calibration, bit:14 was set to 1)",
+                "4": "NO_EGV message",
+                "5": "Valid timestamp",
+                "6": "Valid EGV (valid range)",
+                "7": "Valid algState (algState is 100)",
+                "8": "EGV was successfully added to CGM subsystem array (e.g., not a duplicate)",
+                "9": "OMR reading type",
+                "10": "Real Time Reading from NFC scan"
+              }
+            ]
+          ]
+        },
+        "interval": {
+          "type": "uint8",
+          "offset": 13
+        }
+      }
+    },
+    "394": {
+      "name": "LID_CGM_JOIN_SESSION_G7",
+      "data": {
+        "cgmTimestamp": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "Seconds"
+        },
+        "sessionSignature": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "Seconds"
+        }
+      }
+    },
+    "399": {
+      "name": "LID_CGM_DATA_G7",
+      "data": {
+        "glucoseValueStatus": {
+          "type": "uint16",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Precise Value",
+                "1": "Special High",
+                "2": "Special Low",
+                "6": "Do Not Show"
+              }
+            ]
+          ]
+        },
+        "cgmDataType": {
+          "type": "uint8",
+          "offset": 1,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "FMR",
+                "1": "Backfill",
+                "2": "IMM No longer applies",
+                "3": "Calibration",
+                "4": "None"
+              }
+            ]
+          ]
+        },
+        "rate": {
+          "type": "int8",
+          "offset": 0,
+          "transform": [
+            [
+              "ratio",
+              0.1
+            ]
+          ],
+          "uom": "mg/dL/min/10"
+        },
+        "algorithmState": {
+          "type": "uint8",
+          "offset": 7,
+          "transform": [
+            [
+              "enum",
+              {
+                "2": "Warmup",
+                "30": "Default Electronics Wakeup",
+                "31": "Detecting Deployment",
+                "32": "Reportable Period Valid EGV",
+                "33": "Reportable Period Invalid EGV",
+                "34": "Session Stopped (End of Session)",
+                "35": "Session Stopped (Algorithm Detected Failure)",
+                "36": "Session Stopped (Manual Stop)",
+                "37": "Session Stopped (Transmitter Failure)",
+                "38": "Session Stopped (SIV Failure)",
+                "39": "Session Stopped (Out of Range / Environmental Conditions Detected)"
+              }
+            ]
+          ]
+        },
+        "rssi": {
+          "type": "int8",
+          "offset": 6,
+          "uom": "dBm"
+        },
+        "currentGlucoseDisplayValue": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "mg/dL"
+        },
+        "egvTimeStamp": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "sec"
+        },
+        "egvInfoBitmask": {
+          "type": "uint16",
+          "offset": 14,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Five Minute Reading (FMR)",
+                "1": "Backfill",
+                "2": "Immediate match value",
+                "3": "CRR (EGV is result of calibration, bit:14 was set to 1)",
+                "4": "NO_EGV message",
+                "5": "Valid timestamp",
+                "6": "Valid EGV (valid range)",
+                "7": "Valid algState (algState is 32)",
+                "8": "EGV was successfully added to CGM subsystem array (e.g.,",
+                "9": "Reserved",
+                "10": "Reserved"
+              }
+            ]
+          ]
+        },
+        "interval": {
+          "type": "uint8",
+          "offset": 13
+        }
+      }
+    },
+    "404": {
+      "name": "LID_CGM_START_SESSION_FSL2",
+      "data": {
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 7,
+          "uom": "days"
+        }
+      }
+    },
+    "405": {
+      "name": "LID_CGM_STOP_SESSION_FSL2",
+      "data": {
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionStopTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 11,
+          "uom": "days"
+        },
+        "sessionStopReason": {
+          "type": "uint8",
+          "offset": 10
+        }
+      }
+    },
+    "406": {
+      "name": "LID_CGM_JOIN_SESSION_FSL2",
+      "data": {
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionJoinTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 11,
+          "uom": "days"
+        },
+        "sessionJoinReason": {
+          "type": "uint8",
+          "offset": 10
+        }
+      }
+    },
+    "447": {
+      "name": "LID_CGM_STOP_SESSION_G7",
+      "data": {
+        "currentTransmitterTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "sec"
+        },
+        "sessionStopTime": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 15,
+          "uom": "days"
+        },
+        "sessionStopReason": {
+          "type": "uint8",
+          "offset": 14
+        },
+        "stopSessionCode": {
+          "type": "uint8",
+          "offset": 13
+        }
+      }
+    },
+    "460": {
+      "name": "LID_CGM_ALERT_ACTIVATED_FSL2",
+      "data": {
+        "dalertId": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "dictionary",
+              "dalerts"
+            ]
+          ]
+        },
+        "sensorType": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Invalid",
+                "2": "CGM_TYPE_LIBRE2"
+              }
+            ]
+          ]
+        },
+        "faultLocatorData": {
+          "type": "uint32",
+          "offset": 4
+        },
+        "param1": {
+          "type": "uint32",
+          "offset": 8
+        },
+        "param2": {
+          "type": "float32",
+          "offset": 12
+        }
+      }
+    },
+    "461": {
+      "name": "LID_CGM_ALERT_CLEARED_FSL2",
+      "data": {
+        "dalertId": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "dictionary",
+              "dalerts"
+            ]
+          ]
+        },
+        "sensorType": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Invalid",
+                "2": "CGM_TYPE_LIBRE2"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "477": {
+      "name": "LID_CGM_JOIN_SESSION_FSL3",
+      "data": {
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "Seconds"
+        },
+        "sessionJoinTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "Seconds"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 8,
+          "uom": "Days"
+        },
+        "sessionJoinReason": {
+          "type": "uint8",
+          "offset": 9
+        }
+      }
+    },
+    "480": {
+      "name": "LID_CGM_DATA_FSL3",
+      "data": {
+        "glucoseValueStatus": {
+          "type": "uint8",
+          "offset": 3,
+          "transform": [
+            [
+              "enum",
+              {
+                "0": "Precise Value",
+                "1": "Special High",
+                "2": "Special Low"
+              }
+            ]
+          ]
+        },
+        "cgmDataType": {
+          "type": "uint8",
+          "offset": 2,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Five Minute Reading (FMR)",
+                "1": "Backfill",
+                "4": "None",
+                "5": "One Minute Reading (OMR)"
+              }
+            ]
+          ]
+        },
+        "rate": {
+          "type": "int16",
+          "offset": 0,
+          "transform": [
+            [
+              "ratio",
+              0.1
+            ]
+          ],
+          "uom": "mg/dL/min"
+        },
+        "algorithmState": {
+          "type": "uint8",
+          "offset": 7,
+          "transform": [
+            [
+              "enum",
+              {
+                "100": "OK State"
+              }
+            ]
+          ]
+        },
+        "rssi": {
+          "type": "int8",
+          "offset": 6,
+          "uom": "dBm"
+        },
+        "currentGlucoseDisplayValue": {
+          "type": "uint16",
+          "offset": 4,
+          "uom": "mg/dL"
+        },
+        "egvTimeStamp": {
+          "type": "uint32",
+          "offset": 8,
+          "uom": "Seconds"
+        },
+        "egvInfoBitmask": {
+          "type": "uint16",
+          "offset": 14,
+          "transform": [
+            [
+              "bitmask",
+              {
+                "0": "Five Minute Reading (FMR)",
+                "1": "Backfill",
+                "4": "NO_EGV message",
+                "5": "Valid timestamp",
+                "6": "Valid EGV (valid range)",
+                "7": "Valid algState (algState is 100)",
+                "8": "EGV was successfully added to CGM subsystem array (e.g., not a duplicate)",
+                "9": "OMR reading type",
+                "11": "Sensor Type (see CGMTxType enum)",
+                "12": "Sensor Type (see CGMTxType enum)",
+                "13": "Sensor Type (see CGMTxType enum)"
+              }
+            ]
+          ]
+        },
+        "interval": {
+          "type": "uint8",
+          "offset": 13
+        }
+      }
+    },
+    "486": {
+      "name": "LID_CGM_STOP_SESSION_FSL3",
+      "data": {
+        "sessionStartTime": {
+          "type": "uint32",
+          "offset": 0,
+          "uom": "sec"
+        },
+        "sessionStopTime": {
+          "type": "uint32",
+          "offset": 4,
+          "uom": "sec"
+        },
+        "sessionDuration": {
+          "type": "uint8",
+          "offset": 8,
+          "uom": "days"
+        },
+        "sessionStopReason": {
+          "type": "uint8",
+          "offset": 9
+        }
+      }
+    }
+  }
+}
