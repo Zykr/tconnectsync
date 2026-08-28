@@ -1,4 +1,5 @@
 import sys
+import time
 import datetime
 import arrow
 import argparse
@@ -134,11 +135,14 @@ def main(*args, **kwargs):
         args.pretend = True
 
     if args.auto_update:
+        print("Starting auto-update between", time_start, "and", time_end, "(PRETEND)" if args.pretend else "")
         u = TandemSourceAutoupdate(secret)
         sys.exit(u.process(tconnect, nightscout, args.pretend, features=args.features))
     else:
+        print("Processing data between", time_start, "and", time_end, "(PRETEND)" if args.pretend else "")
+        logging.root.debug("Processing data between " + time_start.strftime('%Y-%m-%d %H:%M:%S') + " and " + time_end.strftime('%Y-%m-%d %H:%M:%S') + " (PRETEND)" if args.pretend else "")
         tconnectDevice = TandemSourceChooseDevice(secret, tconnect).choose()
         added, last_event_id = TandemSourceProcessTimeRange(tconnect, nightscout, tconnectDevice, pretend=args.pretend, secret=secret, features=args.features).process(time_start, time_end)
-
+        print("Added", added, "items")
         # return exit code 0 if processed events
         sys.exit(0 if added>0 else 1)

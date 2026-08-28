@@ -2,9 +2,9 @@
 
 ----
 Fork of jwoglom's tconnectsync, adding a partial raw data export option.
-The issues I originally forked to work on seem to be fixed. No reason to use this version unless you need the export function.
+Most of the issues I originally forked to work on seem to be fixed in main. No reason to use this version unless you need the export function.
 
-	* Left an added exception handler around bug that now seems fixed
+	* Left an added exception handler around a bug
   		parse date throws exception and fails if an extended bolus is in progress during the upload.
 	
 
@@ -12,6 +12,9 @@ I recommend using jwoglom's version as I've very little experience with python. 
 
 Everything below this point in the README is a copy from jwoglom, so if you do choose to use my version take note of that.
 ----
+
+![Python Package workflow](https://github.com/jwoglom/tconnectsync/actions/workflows/python-package.yml/badge.svg)
+[![codecov](https://codecov.io/gh/jwoglom/tconnectsync/branch/master/graph/badge.svg)](https://codecov.io/gh/jwoglom/tconnectsync)
 
 Tconnectsync synchronizes data one-way from Tandem Source to Nightscout.
 
